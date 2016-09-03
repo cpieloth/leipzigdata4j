@@ -20,3 +20,7 @@ dependencies {
 task wrapper(type: Wrapper) {
     gradleVersion = '2.13'
 }
+
+sourceSets.main.resources {
+    srcDirs = ["src/main/sparql"];
+}
