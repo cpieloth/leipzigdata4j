@@ -1,24 +1,13 @@
 ##
-# Get all ld:Unternehmen entities with the attributes: name, address and homepage.
+# Get all ld:Unternehmen entities.
 #
 # @author cpieloth
 #
-PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX ld: <http://leipzig-data.de/Data/Model/>
 
 SELECT
     ?unternehmen
-    ?name
-    ?address
-    ?homepage
 WHERE
 {
     ?unternehmen  a  ld:Unternehmen .
-    ?unternehmen  rdfs:label  ?name .
-    ?unternehmen  ld:hasAddress ?address .
-    OPTIONAL
-    {
-        ?unternehmen  foaf:homepage  ?homepage .
-    }
 }

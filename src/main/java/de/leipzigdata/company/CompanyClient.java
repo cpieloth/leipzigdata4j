@@ -6,9 +6,8 @@ import de.leipzigdata.company.entity.EntityFactory;
 import de.leipzigdata.company.entity.EntityFactoryBuilder;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +52,10 @@ public class CompanyClient {
         List<Company> companies = new LinkedList<>();
 
         results.forEachRemaining(qs -> {
-            Company company = deserialize(qs, ef);
+            String uri = qs.get("unternehmen").asResource().getURI();
+            Model model = ModelFactory.createDefaultModel();
+            model.read(uri);
+            Company company = deserialize(model.getResource(uri), ef);
             if(company != null) {
                 companies.add(company);
             }
@@ -62,63 +64,63 @@ public class CompanyClient {
         return companies;
     }
 
-    private static Company deserialize(QuerySolution qs, EntityFactory ef) {
+    /**
+     * Get a company.
+     *
+     * @param uri URI of the company.
+     * @return Filled company instance or null.
+     */
+    public Company getCompany(URI uri) {
+        EntityFactory ef = EntityFactoryBuilder.newEntityFactory();
+        Model model = ModelFactory.createDefaultModel();
+        model.read(uri.toString());
+        Resource resource = model.getResource(uri.toString());
+        return deserialize(resource, ef);
+    }
+
+    private static Company deserialize(Resource resource, EntityFactory ef) {
         Company company = ef.newCompany();
-        String varName;
 
-        varName = "unternehmen";
-        if (qs.contains(varName)) {
-            try {
-                company.setUri(new URI(qs.get(varName).asResource().getURI()));
-            } catch (URISyntaxException e) {
-                log.error("Could not parse URI!", e);
-                return null;
-            }
-        }
-        else {
-            log.error("Missing variable: " + varName);
+        try {
+            company.setUri(new URI(resource.getURI()));
+        } catch (URISyntaxException e) {
+            log.error("Could not parse URI!", e);
             return null;
         }
 
-        varName = "name";
-        if (qs.contains(varName)) {
-            company.setName(qs.get(varName).asLiteral().getLexicalForm());
-        }
-        else {
-            log.error("Missing variable: " + varName);
-            return null;
-        }
-
-        varName = "address";
-        if (qs.contains(varName)) {
-//            company.setName(qs.get(varName).asLiteral().getLexicalForm());
-            Resource resource = qs.get(varName).asResource();
-            log.debug("{}", resource);
-        }
-        else {
-            log.debug("Missing variable: " + varName);
-        }
-
-        varName = "homepage";
-        if (qs.contains(varName)) {
-            try {
-                company.setHomepage(new URL(qs.get(varName).asResource().getURI()));
-            } catch (MalformedURLException e) {
-                log.error("Could not parse homepage!", e);
+        StmtIterator stmtIterator = resource.listProperties();
+        while(stmtIterator.hasNext()) {
+            Statement stmt = stmtIterator.next();
+            RDFNode node = stmt.getObject();
+            Property predicate = stmt.getPredicate();
+            if ("http://www.w3.org/2000/01/rdf-schema#label".equals(predicate.getURI())) {
+                company.setName(node.asLiteral().getString());
+                continue;
             }
-        }
-        else {
-            log.debug("Missing variable: " + varName);
+            if ("http://xmlns.com/foaf/0.1/homepage".equals(predicate.getURI())) {
+                try {
+                    company.setHomepage(new URL(node.asResource().getURI()));
+                } catch (MalformedURLException e) {
+                    log.error("Could not create URL for homepage!", e);
+                }
+                continue;
+            }
+            if ("http://leipzig-data.de/Data/Model/hasAddress".equals(predicate.getURI())) {
+                final String addressUri = node.asResource().getURI();
+                final String addressPart = addressUri.substring(addressUri.lastIndexOf("/") + 1);
+                final String addressParts[] = addressPart.split("\\.");
+                if (addressParts.length == 4) {
+                    company.setPostcode(addressParts[0]);
+                    company.setCity(addressParts[1]);
+                    company.setStreet(addressParts[2]);
+                    company.setStreet(addressParts[3]);
+                }
+                else {
+                    log.error("Could not parse address: {}, {}, {}", addressUri, addressPart, addressParts.length);
+                }
+            }
         }
 
         return company;
-    }
-
-    public static void main(String[] args) {
-        CompanyClient client = new CompanyClient();
-        List<Company> companies = client.getCompanies();
-
-        companies.forEach(System.out::println);
-        System.out.println("Company count: " + companies.size());
     }
 }

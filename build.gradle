@@ -21,6 +21,11 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.13'
 }
 
-sourceSets.main.resources {
-    srcDirs = ["src/main/sparql"];
+sourceSets.main {
+    resources {
+        srcDirs = ["src/main/sparql"];
+    }
+    java {
+        exclude 'examples'
+    }
 }
