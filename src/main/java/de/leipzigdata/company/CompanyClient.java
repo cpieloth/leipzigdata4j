@@ -36,7 +36,7 @@ public class CompanyClient {
      * @return List of companies or null.
      */
     public List<Company> getCompanies() {
-        final String file_name = "getCompanies.sparql";
+        final String file_name = "getCompanies.rq";
 
         ResultSet results;
         try {
@@ -52,7 +52,7 @@ public class CompanyClient {
         List<Company> companies = new LinkedList<>();
 
         results.forEachRemaining(qs -> {
-            String uri = qs.get("unternehmen").asResource().getURI();
+            String uri = qs.getResource("resource").getURI();
             Model model = ModelFactory.createDefaultModel();
             model.read(uri);
             Company company = deserialize(model.getResource(uri), ef);

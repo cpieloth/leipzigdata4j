@@ -1,0 +1,12 @@
+##
+# Get all ld:Unternehmen resources.
+#
+# @author cpieloth
+#
+PREFIX ld: <http://leipzig-data.de/Data/Model/>
+
+SELECT *
+WHERE
+{
+    ?resource  a  ld:Unternehmen .
+}
