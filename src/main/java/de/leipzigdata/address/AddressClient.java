@@ -18,7 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * TODO doc
+ * A client to access data from ld:Adresse.
  *
  * @author cpieloth
  */

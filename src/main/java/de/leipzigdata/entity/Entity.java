@@ -3,7 +3,7 @@ package de.leipzigdata.entity;
 import java.net.URI;
 
 /**
- * TODO doc
+ * Basic entity entity interface.
  *
  * @author cpieloth
  */
