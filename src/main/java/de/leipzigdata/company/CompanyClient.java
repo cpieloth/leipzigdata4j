@@ -1,6 +1,8 @@
 package de.leipzigdata.company;
 
 import de.leipzigdata.LeipzigDataHelper;
+import de.leipzigdata.address.AddressClient;
+import de.leipzigdata.address.entity.Address;
 import de.leipzigdata.company.entity.Company;
 import de.leipzigdata.company.entity.EntityFactory;
 import de.leipzigdata.company.entity.EntityFactoryBuilder;
@@ -93,11 +95,12 @@ public class CompanyClient {
             Statement stmt = stmtIterator.next();
             RDFNode node = stmt.getObject();
             Property predicate = stmt.getPredicate();
-            if ("http://www.w3.org/2000/01/rdf-schema#label".equals(predicate.getURI())) {
-                company.setName(node.asLiteral().getString());
+            final String uri = predicate.getURI();
+            if ("http://www.w3.org/2000/01/rdf-schema#label".equals(uri)) {
+                company.setLabel(node.asLiteral().getString());
                 continue;
             }
-            if ("http://xmlns.com/foaf/0.1/homepage".equals(predicate.getURI())) {
+            if ("http://xmlns.com/foaf/0.1/homepage".equals(uri)) {
                 try {
                     company.setHomepage(new URL(node.asResource().getURI()));
                 } catch (MalformedURLException e) {
@@ -105,18 +108,14 @@ public class CompanyClient {
                 }
                 continue;
             }
-            if ("http://leipzig-data.de/Data/Model/hasAddress".equals(predicate.getURI())) {
-                final String addressUri = node.asResource().getURI();
-                final String addressPart = addressUri.substring(addressUri.lastIndexOf("/") + 1);
-                final String addressParts[] = addressPart.split("\\.");
-                if (addressParts.length == 4) {
-                    company.setPostcode(addressParts[0]);
-                    company.setCity(addressParts[1]);
-                    company.setStreet(addressParts[2]);
-                    company.setStreet(addressParts[3]);
-                }
-                else {
-                    log.error("Could not parse address: {}, {}, {}", addressUri, addressPart, addressParts.length);
+            if ("http://leipzig-data.de/Data/Model/hasAddress".equals(uri)) {
+                AddressClient addressClient = new AddressClient();
+                try {
+                    final URI addressUri = new URI(node.asResource().getURI());
+                    Address address = addressClient.getAddress(addressUri);
+                    company.setAddress(address);
+                } catch (URISyntaxException e) {
+                    log.error("Could not parse URI for address!", e);
                 }
             }
         }

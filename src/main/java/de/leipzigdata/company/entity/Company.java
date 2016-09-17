@@ -1,5 +1,8 @@
 package de.leipzigdata.company.entity;
 
+import de.leipzigdata.address.entity.Address;
+import de.leipzigdata.entity.Entity;
+
 import java.net.URI;
 import java.net.URL;
 
@@ -8,24 +11,9 @@ import java.net.URL;
  *
  * @author cpieloth
  */
-public interface Company {
-    URI getUri();
-    void setUri(URI uri);
-
-    String getName();
-    void setName(String name);
-
-    String getStreet();
-    void setStreet(String street);
-
-    int getHousenumber();
-    void setHousenumber(int housenumber);
-
-    String getPostcode();
-    void setPostcode(String postcode);
-
-    String getCity();
-    void setCity(String city);
+public interface Company extends Entity {
+    Address getAddress();
+    void setAddress(Address address);
 
     URL getHomepage();
     void setHomepage(URL homepage);

@@ -22,7 +22,7 @@ public class CompanyClientExample {
         }
 
         List<Company> companies = client.getCompanies();
-        System.out.println("Company count: " + companies.size());
         companies.forEach(System.out::println);
+        System.out.println("Company count: " + companies.size());
     }
 }

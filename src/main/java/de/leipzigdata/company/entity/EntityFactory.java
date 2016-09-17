@@ -1,7 +1,7 @@
 package de.leipzigdata.company.entity;
 
 /**
- * A entity factory for company.
+ * An entity factory for company.
  * Creation of a concrete entity types, e.g. for JPA implementation.
  *
  * @author cpieloth

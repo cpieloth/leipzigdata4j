@@ -1,5 +1,8 @@
 package de.leipzigdata.company.entity;
 
+import de.leipzigdata.address.entity.Address;
+import de.leipzigdata.entity.DefaultEntity;
+
 import java.net.URI;
 import java.net.URL;
 
@@ -8,76 +11,21 @@ import java.net.URL;
  *
  * @author cpieloth
  */
-public class DefaultCompany implements Company {
-    private URI uri;
-    private String name;
-    private String street;
-    private int housenumber;
-    private String postcode;
-    private String city;
+public class DefaultCompany extends DefaultEntity implements Company {
+    private Address address;
     private URL homepage;
 
     public DefaultCompany() {
     }
 
     @Override
-    public URI getUri() {
-        return uri;
+    public Address getAddress() {
+        return address;
     }
 
     @Override
-    public void setUri(URI uri) {
-        this.uri = uri;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getStreet() {
-        return street;
-    }
-
-    @Override
-    public void setStreet(String street) {
-        this.street = street;
-    }
-
-    @Override
-    public int getHousenumber() {
-        return housenumber;
-    }
-
-    @Override
-    public void setHousenumber(int housenumber) {
-        this.housenumber = housenumber;
-    }
-
-    @Override
-    public String getPostcode() {
-        return postcode;
-    }
-
-    @Override
-    public void setPostcode(String postcode) {
-        this.postcode = postcode;
-    }
-
-    @Override
-    public String getCity() {
-        return city;
-    }
-
-    @Override
-    public void setCity(String city) {
-        this.city = city;
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
     @Override
@@ -92,6 +40,12 @@ public class DefaultCompany implements Company {
 
     @Override
     public String toString() {
-        return "" + this.getClass().getSimpleName() + "[uri=" + uri.toString() + ", name=" + name + ", ...]";
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.getClass().getSimpleName()).append("[");
+        sb.append("uri=").append( uri.toString());
+        sb.append(", label=").append(label);
+        sb.append(", address=").append(address);
+        sb.append("]");
+        return sb.toString();
     }
 }
