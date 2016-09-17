@@ -85,7 +85,11 @@ public class AddressClient {
             log.error("Could not parse URI!", e);
             return null;
         }
-        address.setCity("Leipzig");
+        if(resource.getURI().toLowerCase().contains("leipzig")) {
+            address.setCity("Leipzig");
+        } else {
+            log.warn("Unknown city for resource: {}", resource.getURI());
+        }
 
         StmtIterator stmtIterator = resource.listProperties();
         while(stmtIterator.hasNext()) {
